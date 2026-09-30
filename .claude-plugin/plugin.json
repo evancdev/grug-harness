@@ -1,0 +1,8 @@
+{
+  "name": "grug",
+  "description": "Personal Claude Code plugin.",
+  "author": {
+    "name": "evancdev",
+    "url": "https://github.com/evancdev"
+  }
+}
