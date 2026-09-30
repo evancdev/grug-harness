@@ -3,6 +3,9 @@ name = "grug-harness"
 version = "0"
 requires-python = ">=3.11"
 
+[dependency-groups]
+dev = ["pytest==9.1.1", "ruff==0.16.9", "ty==0.0.84"]
+
 [tool.ty.terminal]
 error-on-warning = true
 
