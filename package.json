@@ -1,6 +1,0 @@
-{
-  "private": true,
-  "devDependencies": {
-    "@anthropic-ai/claude-code": "2.1.285"
-  }
-}

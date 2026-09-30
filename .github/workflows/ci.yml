@@ -11,6 +11,8 @@ env:
   UV_VERSION: 0.12.21
   # Fail if uv.lock is out of date instead of rewriting it.
   UV_LOCKED: 1
+  # Bumped by hand: Dependabot cannot update a global npm install.
+  CLAUDE_CODE_VERSION: 2.1.285
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -80,13 +82,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - run: npm ci --no-audit --no-fund
-      - run: npx claude plugin validate .
+      - run: npm install --global --no-audit --no-fund "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}" # zizmor: ignore[adhoc-packages]
+      - run: claude plugin validate .
       # validate checks skill files only in a folder without a manifest.
       - run: |
           mkdir "$RUNNER_TEMP/components"
           cp -R skills "$RUNNER_TEMP/components/"
-          npx claude plugin validate --strict "$RUNNER_TEMP/components"
+          claude plugin validate --strict "$RUNNER_TEMP/components"
 
   zizmor:
     name: zizmor
