@@ -13,14 +13,14 @@ def fail_with(error):
     return fail
 
 
-def test_creates_the_file_and_its_folders(tmp_path):
+def test_new_file_gets_folders_and_0600(tmp_path):
     target = tmp_path / "a" / "b" / "settings.json"
     atomic_write(target, "new\n")
     assert target.read_text() == "new\n"
     assert stat.S_IMODE(target.stat().st_mode) == 0o600
 
 
-def test_replace_syncs_and_keeps_permissions_before_renaming(tmp_path, monkeypatch):
+def test_replace_syncs_and_copies_mode_before_rename(tmp_path, monkeypatch):
     target = tmp_path / "settings.json"
     target.write_text("old\n")
     target.chmod(0o640)
@@ -42,7 +42,7 @@ def test_replace_syncs_and_keeps_permissions_before_renaming(tmp_path, monkeypat
     assert target.read_text() == "new text\n"
 
 
-def test_writes_through_a_symlink(tmp_path):
+def test_symlink_is_written_through(tmp_path):
     real = tmp_path / "dotfiles" / "settings.json"
     real.parent.mkdir()
     real.write_text("old\n")
@@ -60,7 +60,7 @@ def test_writes_through_a_symlink(tmp_path):
         pytest.param("replace", OSError, id="rename-fails"),
     ],
 )
-def test_a_failure_leaves_the_file_as_it_was(tmp_path, monkeypatch, step, error):
+def test_failure_leaves_file_unchanged(tmp_path, monkeypatch, step, error):
     target = tmp_path / "settings.json"
     target.write_text("old\n")
     monkeypatch.setattr(os, step, fail_with(error))
@@ -70,9 +70,7 @@ def test_a_failure_leaves_the_file_as_it_was(tmp_path, monkeypatch, step, error)
     assert target.read_text() == "old\n"
 
 
-def test_a_failed_cleanup_keeps_the_original_error_and_the_temp_file(
-    tmp_path, monkeypatch
-):
+def test_failed_cleanup_raises_original_error(tmp_path, monkeypatch):
     error = OSError("rename failed")
     monkeypatch.setattr(os, "replace", fail_with(error))
     monkeypatch.setattr(os, "unlink", fail_with(OSError("unlink failed")))
