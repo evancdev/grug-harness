@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/grug-bot.py\" session-end",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
