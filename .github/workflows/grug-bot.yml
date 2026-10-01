@@ -23,15 +23,20 @@ jobs:
     # comment before a step can read a secret. It also stops the bot's own
     # comments, so a reply that quotes "@grug-bot" cannot start another run.
     # Plain issues are left out because the app has no issues permission.
+    # A "local" label means a Claude session on the owner's machine is
+    # watching the PR and answers instead.
     if: >-
       (github.event_name == 'issue_comment'
         && github.event.issue.pull_request
+        && !contains(github.event.issue.labels.*.name, 'local')
         && github.event.comment.author_association == 'OWNER'
         && contains(github.event.comment.body, '@grug-bot'))
       || (github.event_name == 'pull_request_review_comment'
+        && !contains(github.event.pull_request.labels.*.name, 'local')
         && github.event.comment.author_association == 'OWNER'
         && contains(github.event.comment.body, '@grug-bot'))
       || (github.event_name == 'pull_request_review'
+        && !contains(github.event.pull_request.labels.*.name, 'local')
         && github.event.review.author_association == 'OWNER'
         && contains(github.event.review.body, '@grug-bot'))
     runs-on: ubuntu-latest
@@ -62,3 +67,6 @@ jobs:
           bot_name: grug-bot[bot]
           bot_id: "336202702"
           claude_args: --model claude-opus-5-5
+          # Installs from main, so a PR's plugin changes show up after merge.
+          plugin_marketplaces: https://github.com/evancdev/grug-harness.git
+          plugins: grug@grug
