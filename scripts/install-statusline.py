@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 """Points Claude Code's statusLine setting at statusline.py in this folder.
 
-The plugin's SessionStart hook runs this every time a session starts. It sets
-statusLine when there is none, and moves it off a grug copy that Claude Code
-replaced or deleted, so the status line keeps working after an update. Any
-other statusLine stays as it is. Claude Code adds a SessionStart hook's stdout
-to the session, so nothing goes to stdout.
+The plugin's SessionStart hook runs this every time a session starts, so the
+setting follows grug to each new version folder. Claude Code adds a
+SessionStart hook's stdout to the session, so nothing goes to stdout.
 """
 
 import json
@@ -24,9 +22,8 @@ def _stale_grug(old: dict, deleted_only: bool) -> bool:
     # An install from GitHub lives in <cache>/grug/grug/<version>/. An update
     # marks the old version folder with .orphaned_at, and Claude Code deletes
     # it 14 days later. Sessions that started before an update still run this
-    # hook from an old folder. So a live folder is never taken over, and an
-    # old copy takes over only a deleted one, or versions would keep swapping
-    # the setting.
+    # hook from an old folder, so if a copy took over a live folder, or an old
+    # copy took over another old one, versions would keep swapping the setting.
     command = old.get("command")
     if old.get("type") != "command" or not isinstance(command, str):
         return False
@@ -59,7 +56,7 @@ def main() -> None:
             "error: grug needs Python 3.11 or newer, and python3 is"
             f" {sys.version.split()[0]}. Run `brew install python`."
         )
-    # Imported after the version check, since _lib can use newer syntax.
+    # _lib can use syntax that Python 3.9 can't run.
     from _lib import atomic_write
 
     statusline = Path(__file__).resolve().parent / "statusline.py"

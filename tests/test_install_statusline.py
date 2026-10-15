@@ -142,7 +142,7 @@ def test_statusline_gets_execute_bits(installer, home):
 
 
 def test_executable_statusline_not_touched(installer, home):
-    # A plugin folder can be read-only, so chmod runs only when it must.
+    # A plugin folder can be read-only.
     statusline = installer.with_name("statusline.py")
     statusline.chmod(0o755)
     before = statusline.stat().st_ctime_ns
@@ -247,7 +247,7 @@ def test_live_grug_copy_left_alone(cache, home):
 
 
 def test_replaced_copy_leaves_other_replaced_copy_alone(cache, home):
-    # Two updates while old sessions run: neither old copy takes the setting.
+    # Two updates happened while sessions from both old versions still run.
     installer = copy_plugin(cache / "v1" / "scripts")
     orphan(cache / "v1")
     text = write_settings(home, {"statusLine": entry(orphan(cache / "v2"))})
@@ -298,7 +298,6 @@ def test_checkout_leaves_live_sibling_alone(tmp_path, home):
     ],
 )  # fmt: skip
 def test_dead_lookalike_left_alone(cache, home, make):
-    # None of these folders exist, so only the shape of the path decides.
     installer = copy_plugin(cache / "new" / "scripts")
     text = write_settings(home, {"statusLine": make(cache)})
     assert install(installer, home) == (0, "", "")
@@ -325,7 +324,7 @@ def test_unusable_settings_left_untouched(installer, home, data, error):
 def assert_one_line_error(path: Path, data: bytes, result: tuple[int, str, str]):
     code, out, err = result
     assert (code, out) == (1, "")
-    # One line, not a traceback, since the user sees it at every session start.
+    # The user sees this at every session start.
     assert err.startswith(
         ("error: cannot write ", f"error: {path} is not valid JSON: ")
     )
